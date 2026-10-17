@@ -85,6 +85,7 @@
     display:flex;
     align-items:center;
     justify-content:center;
+    padding:24px max(20px, env(safe-area-inset-right)) 24px max(20px, env(safe-area-inset-left));
     background: radial-gradient(ellipse at center, #145243 0%, var(--emerald-deep) 55%, #082820 100%);
     transition: opacity 0.7s ease;
     perspective: 1400px;
@@ -100,13 +101,14 @@
     display:flex;
     flex-direction:column;
     align-items:center;
+    max-height:100%;
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
   }
   .card-stage:focus-visible{ outline:2px solid var(--gold-soft); outline-offset:10px; }
 
   .card-tap-hint{
-    margin-top:30px;
+    margin-top:clamp(18px, 4vh, 30px);
     font-size:14px;
     letter-spacing:0.3em;
     text-transform:uppercase;
@@ -125,7 +127,7 @@
   /* The card itself: a book/gate that opens in 3D, then zooms through like a portal */
   .card-book{
     position:relative;
-    width:min(60vw, 250px);
+    width:clamp(120px, min(60vw, 28vh), 250px);
     aspect-ratio: 3 / 4;
     transform-style: preserve-3d;
     filter: drop-shadow(0 16px 36px rgba(0,0,0,0.5));
@@ -153,7 +155,7 @@
     background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-deep) 100%);
     box-sizing:border-box;
     backface-visibility:hidden;
-    transition: transform 0.85s cubic-bezier(.6,-0.1,.2,1.15);
+    transition: transform 0.75s cubic-bezier(.22,.75,.25,1);
   }
   .door-left{
     left:0;
@@ -225,6 +227,13 @@
     .card-door, .card-logo, .card-book{ transition-duration:0.4s; }
     .card-book.zoom{ transform:scale(1.05); }
   }
+  @media (max-width:600px){
+    .card-book.zoom{ transform:scale(4.4); }
+  }
+  @media (max-width:600px) and (max-height:480px){
+    .card-book{ width:clamp(100px, 24vh, 150px); }
+    .card-book.zoom{ transform:scale(3.6); }
+  }
 
   /* Falling petals */
   .petal-layer{
@@ -249,6 +258,65 @@
   }
   @media (prefers-reduced-motion: reduce){
     .petal{ display:none; }
+  }
+
+  .music-toggle{
+    position:fixed;
+    right:max(20px, env(safe-area-inset-right));
+    bottom:max(20px, env(safe-area-inset-bottom));
+    z-index:1000;
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    min-height:48px;
+    padding:0 18px;
+    border:1px solid var(--gold);
+    border-radius:999px;
+    background:rgba(11,61,50,0.96);
+    color:var(--gold-soft);
+    box-shadow:0 8px 24px rgba(8,40,32,0.28);
+    font:600 14px 'Cormorant Garamond',serif;
+    letter-spacing:0.04em;
+    cursor:pointer;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transform:translateY(12px);
+    transition:opacity 0.35s ease, transform 0.35s ease, background-color 0.2s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  body.music-ready .music-toggle{
+    opacity:1;
+    pointer-events:auto;
+    transform:translateY(0);
+    visibility:visible;
+  }
+  .music-toggle:hover{ background:var(--emerald); }
+  .music-toggle:focus-visible{ outline:2px solid var(--gold-soft); outline-offset:4px; }
+  .music-toggle svg{ width:17px; height:17px; flex:none; }
+  .music-toggle.is-playing::before{
+    content:"";
+    position:absolute;
+    inset:-4px;
+    border:1px solid rgba(228,207,154,0.55);
+    border-radius:inherit;
+    animation: music-pulse 2.4s ease-out infinite;
+    pointer-events:none;
+  }
+  @keyframes music-pulse{
+    0%{ opacity:0.7; transform:scale(0.98); }
+    100%{ opacity:0; transform:scale(1.16); }
+  }
+  .music-status{
+    position:absolute;
+    width:1px;
+    height:1px;
+    padding:0;
+    margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
   }
 
   /* ---------- Decorative crescent/star field on dark sections ---------- */
@@ -539,6 +607,36 @@
     font-style:italic;
     color:#4a5c54;
     line-height:1.7;
+  }
+  @media (max-width:600px){
+    .shayari-featured{
+      padding:24px 18px;
+    }
+    .shayari-featured::before{
+      top:6px;
+      left:6px;
+      right:6px;
+      bottom:6px;
+    }
+    .shayari-featured .lang-block + .lang-block{
+      margin-top:16px;
+      padding-top:16px;
+    }
+    .shayari-featured .lang-tag{
+      margin-bottom:4px;
+    }
+    .shayari-featured .urdu{
+      font-size:22px;
+      line-height:1.8;
+    }
+    .shayari-featured .hindi{
+      font-size:18px;
+      line-height:1.7;
+    }
+    .shayari-featured .english{
+      font-size:18px;
+      line-height:1.55;
+    }
   }
 
   /* ---------- Blessing verse ---------- */
@@ -853,6 +951,26 @@
     color:#8a9691;
     padding:14px 0;
   }
+  @media (max-width:380px){
+    .contacts-grid-single,
+    .contact-group,
+    .contact-list{
+      width:100%;
+      min-width:0;
+    }
+    .contact-card{
+      flex-wrap:wrap;
+      gap:10px;
+      padding:14px 12px;
+    }
+    .contact-card .who{ min-width:0; }
+    .contact-card .name{ font-size:17px; }
+    .contact-card .call-btn{
+      max-width:100%;
+      white-space:normal;
+      overflow-wrap:anywhere;
+    }
+  }
 
   /* ---------- Footer ---------- */
   footer{
@@ -903,6 +1021,15 @@
   </div>
 </div>
 <div class="petal-layer" id="petalLayer" aria-hidden="true"></div>
+<audio id="invitationMusic" src="walimah-song.mp3" preload="auto" loop></audio>
+<button class="music-toggle" id="musicToggle" type="button" aria-label="Play music" aria-pressed="false">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path id="musicPlayIcon" d="m9 6 10 6-10 6V6Z" hidden></path>
+    <path id="musicPauseIcon" d="M8 6v12M16 6v12"></path>
+  </svg>
+  <span id="musicToggleText">Play music</span>
+</button>
+<span class="music-status" id="musicStatus" role="status" aria-live="polite"></span>
 
 <div class="bg-pattern" aria-hidden="true"></div>
 
@@ -1235,9 +1362,50 @@ setInterval(updateCountdown, 1000);
   const intro = document.getElementById("cardIntro");
   const stage = document.getElementById("cardStage");
   const petalLayer = document.getElementById("petalLayer");
+  const music = document.getElementById("invitationMusic");
+  const musicToggle = document.getElementById("musicToggle");
+  const musicToggleText = document.getElementById("musicToggleText");
+  const musicPlayIcon = document.getElementById("musicPlayIcon");
+  const musicPauseIcon = document.getElementById("musicPauseIcon");
+  const musicStatus = document.getElementById("musicStatus");
   if(!intro || !stage) return;
 
   const prefersReduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function updateMusicControl(isPlaying){
+    musicToggle.classList.toggle("is-playing", isPlaying);
+    musicToggle.setAttribute("aria-pressed", String(isPlaying));
+    musicToggle.setAttribute("aria-label", isPlaying ? "Pause music" : "Play music");
+    musicToggleText.textContent = isPlaying ? "Pause music" : "Play music";
+    musicPlayIcon.hidden = isPlaying;
+    musicPauseIcon.hidden = !isPlaying;
+  }
+
+  function playMusic(){
+    const playback = music.play();
+    if(playback){
+      playback.then(() => {
+        musicStatus.textContent = "";
+      }).catch(() => {
+        updateMusicControl(false);
+        musicStatus.textContent = "Music could not start. Use the music button to try again.";
+      });
+    }
+  }
+
+  music.addEventListener("play", () => updateMusicControl(true));
+  music.addEventListener("pause", () => updateMusicControl(false));
+  music.addEventListener("error", () => {
+    updateMusicControl(false);
+    musicStatus.textContent = "Music file could not be loaded.";
+  });
+  musicToggle.addEventListener("click", () => {
+    if(music.paused){
+      playMusic();
+    } else {
+      music.pause();
+    }
+  });
 
   function spawnPetals(count){
     const glyphs = ["✿","❀","❁","❋","✦"];
@@ -1265,9 +1433,11 @@ setInterval(updateCountdown, 1000);
   function openCard(){
     if(stage.classList.contains("opening")) return;
     stage.classList.add("opening");
+    playMusic();
 
     if(prefersReduced){
       document.body.classList.remove("card-locked");
+      document.body.classList.add("music-ready");
       intro.classList.add("hide");
       setTimeout(() => intro.classList.add("removed"), 50);
       spawnPetals(14);
@@ -1291,6 +1461,7 @@ setInterval(updateCountdown, 1000);
 
     setTimeout(() => {
       intro.classList.add("removed");
+      document.body.classList.add("music-ready");
     }, 2100);
 
     // A final light flurry as the page settles into view
